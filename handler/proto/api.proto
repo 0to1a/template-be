@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "project/compiled";
+
+import "google/api/annotations.proto";
+
+service API {
+  rpc Health(HealthRequest) returns (HealthResponse) {
+    option (google.api.http) = { get: "/health" };
+  }
+
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/login"
+      body: "*"
+    };
+  }
+
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
+    option (google.api.http) = { get: "/user/profile" };
+  }
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message GetProfileRequest {}
+
+message GetProfileResponse {
+  int64 id = 1;
+  string email = 2;
+  string name = 3;
+  string created_at = 4;
+}
