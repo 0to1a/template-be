@@ -1,10 +1,10 @@
 -- name: FindUserByEmail :one
-SELECT id, email, name, token, created_at, deleted_at
+SELECT id, email, name, token, created_at
 FROM users
 WHERE email = $1 AND deleted_at IS NULL;
 
 -- name: FindUserByToken :one
-SELECT id, email, name, token, created_at, deleted_at
+SELECT id, email, name, token, created_at
 FROM users
 WHERE token = $1::text AND deleted_at IS NULL;
 
