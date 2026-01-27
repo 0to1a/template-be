@@ -35,9 +35,14 @@ func main() {
 	// Connect to database
 	pool, err := pgxpool.New(context.Background(), cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("Failed to open database: %v", err)
 	}
 	defer pool.Close()
+
+	// Verify database connection
+	if err := pool.Ping(context.Background()); err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
 
 	// Initialize layers
 	queries := compiled.New(pool)

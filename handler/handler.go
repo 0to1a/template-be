@@ -57,12 +57,17 @@ func (h *Handler) authenticate(ctx context.Context) (*compiled.User, error) {
 		return nil, err
 	}
 
-	user, err := h.queries.FindUserByToken(ctx, token)
+	row, err := h.queries.FindUserByToken(ctx, token)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid token")
 	}
 
-	return &user, nil
+	return &compiled.User{
+		ID:        row.ID,
+		Email:     row.Email,
+		Name:      row.Name,
+		CreatedAt: row.CreatedAt,
+	}, nil
 }
 
 func extractToken(ctx context.Context) (string, error) {
