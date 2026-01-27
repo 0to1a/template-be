@@ -8,7 +8,6 @@ buf.lock
 
 # Binary
 bin/
-server
 
 # IDE
 .idea/
@@ -17,4 +16,5 @@ server
 
 # OS
 .DS_Store
+._*
 .claude
