@@ -7,17 +7,13 @@ RUN apk add --no-cache curl git
 RUN curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-$(uname -m)" -o /usr/local/bin/buf && \
     chmod +x /usr/local/bin/buf
 
-# Install protoc plugins (with cache)
-RUN --mount=type=cache,id=go-mod,target=/go/pkg/mod \
-    --mount=type=cache,id=go-build,target=/root/.cache/go-build \
-    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+# Install protoc plugins
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
     go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
 
-# Install sqlc (with cache)
-RUN --mount=type=cache,id=go-mod,target=/go/pkg/mod \
-    --mount=type=cache,id=go-build,target=/root/.cache/go-build \
-    go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+# Install sqlc
+RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
 WORKDIR /app
 
@@ -25,9 +21,8 @@ WORKDIR /app
 COPY buf.yaml buf.gen.yaml ./
 COPY handler/proto/ handler/proto/
 
-# Generate proto code (with buf cache)
-RUN --mount=type=cache,id=buf-cache,target=/root/.cache/buf \
-    buf dep update && buf generate
+# Generate proto code
+RUN buf dep update && buf generate
 
 # Copy sqlc config and generate
 COPY sqlc.yaml ./
@@ -43,8 +38,7 @@ WORKDIR /app
 
 # Copy go mod files
 COPY go.mod go.sum ./
-RUN --mount=type=cache,id=go-mod,target=/go/pkg/mod \
-    go mod download
+RUN go mod download
 
 # Copy generated code from proto-builder
 COPY --from=proto-builder /app/compiled/ compiled/
@@ -55,10 +49,8 @@ COPY handler/ handler/
 COPY database/ database/
 COPY service/ service/
 
-# Build binary (with cache)
-RUN --mount=type=cache,id=go-mod,target=/go/pkg/mod \
-    --mount=type=cache,id=go-build,target=/root/.cache/go-build \
-    CGO_ENABLED=0 GOOS=linux go build -o /server ./cmd/server
+# Build binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o /server ./cmd/server
 
 # Final stage
 FROM alpine:3.19
