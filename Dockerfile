@@ -7,13 +7,11 @@ RUN apk add --no-cache curl git
 RUN curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-$(uname -m)" -o /usr/local/bin/buf && \
     chmod +x /usr/local/bin/buf
 
-# Install protoc plugins
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
-    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
-    go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
-
-# Install sqlc
-RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+# Install protoc plugins and sqlc (pinned versions, combined for fewer layers)
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11 && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.0 && \
+    go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.27.5 && \
+    go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0
 
 WORKDIR /app
 
