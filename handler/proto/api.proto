@@ -21,6 +21,27 @@ service API {
   rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
     option (google.api.http) = { get: "/user/profile" };
   }
+
+  rpc CreateCompany(CreateCompanyRequest) returns (CreateCompanyResponse) {
+    option (google.api.http) = {
+      post: "/companies"
+      body: "*"
+    };
+  }
+
+  rpc SelectCompany(SelectCompanyRequest) returns (SelectCompanyResponse) {
+    option (google.api.http) = {
+      post: "/companies/select"
+      body: "*"
+    };
+  }
+
+  rpc InviteUser(InviteUserRequest) returns (InviteUserResponse) {
+    option (google.api.http) = {
+      post: "/companies/invite"
+      body: "*"
+    };
+  }
 }
 
 message HealthRequest {}
@@ -45,4 +66,47 @@ message GetProfileResponse {
   string email = 2;
   string name = 3;
   string created_at = 4;
+  repeated CompanyInfo companies = 5;
+  CompanyInfo selected_company = 6;
+  bool is_owner = 7;
+}
+
+message CompanyInfo {
+  int64 id = 1;
+  string name = 2;
+  string role = 3;
+  bool is_owner = 4;
+  string created_at = 5;
+}
+
+message CreateCompanyRequest {
+  string company_name = 1;
+}
+
+message CreateCompanyResponse {
+  int64 id = 1;
+  string company_name = 2;
+  string created_at = 3;
+}
+
+message SelectCompanyRequest {
+  int64 company_id = 1;
+}
+
+message SelectCompanyResponse {
+  bool success = 1;
+  CompanyInfo selected_company = 2;
+}
+
+message InviteUserRequest {
+  string email = 1;
+  string name = 2;
+  string role = 3;
+}
+
+message InviteUserResponse {
+  int64 user_id = 1;
+  string email = 2;
+  string name = 3;
+  string role = 4;
 }

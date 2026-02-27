@@ -24,14 +24,16 @@ var publicMethods = map[string]bool{
 
 type Handler struct {
 	compiled.UnimplementedAPIServer
-	authService *service.AuthService
-	queries     *compiled.Queries
+	authService    *service.AuthService
+	companyService *service.CompanyService
+	queries        *compiled.Queries
 }
 
-func NewHandler(authService *service.AuthService, queries *compiled.Queries) *Handler {
+func NewHandler(authService *service.AuthService, companyService *service.CompanyService, queries *compiled.Queries) *Handler {
 	return &Handler{
-		authService: authService,
-		queries:     queries,
+		authService:    authService,
+		companyService: companyService,
+		queries:        queries,
 	}
 }
 
@@ -51,7 +53,15 @@ func (h *Handler) AuthInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-func (h *Handler) authenticate(ctx context.Context) (*compiled.User, error) {
+type AuthenticatedUser struct {
+	ID                int32
+	Email             string
+	Name              string
+	SelectedCompanyID int32
+	CreatedAt         string
+}
+
+func (h *Handler) authenticate(ctx context.Context) (*AuthenticatedUser, error) {
 	token, err := extractToken(ctx)
 	if err != nil {
 		return nil, err
@@ -62,11 +72,17 @@ func (h *Handler) authenticate(ctx context.Context) (*compiled.User, error) {
 		return nil, status.Error(codes.Unauthenticated, "invalid token")
 	}
 
-	return &compiled.User{
-		ID:        row.ID,
-		Email:     row.Email,
-		Name:      row.Name,
-		CreatedAt: row.CreatedAt,
+	var selectedCompanyID int32
+	if row.SelectedCompanyID.Valid {
+		selectedCompanyID = row.SelectedCompanyID.Int32
+	}
+
+	return &AuthenticatedUser{
+		ID:                row.ID,
+		Email:             row.Email,
+		Name:              row.Name,
+		SelectedCompanyID: selectedCompanyID,
+		CreatedAt:         row.CreatedAt.Time.Format("2006-01-02T15:04:05Z"),
 	}, nil
 }
 
@@ -89,7 +105,7 @@ func extractToken(ctx context.Context) (string, error) {
 	return parts[1], nil
 }
 
-func UserFromContext(ctx context.Context) (*compiled.User, bool) {
-	user, ok := ctx.Value(UserContextKey).(*compiled.User)
+func UserFromContext(ctx context.Context) (*AuthenticatedUser, bool) {
+	user, ok := ctx.Value(UserContextKey).(*AuthenticatedUser)
 	return user, ok
 }
