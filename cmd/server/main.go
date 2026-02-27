@@ -47,7 +47,8 @@ func main() {
 	// Initialize layers
 	queries := compiled.New(pool)
 	authService := service.NewAuthService(queries)
-	h := handler.NewHandler(authService, queries)
+	companyService := service.NewCompanyService(queries)
+	h := handler.NewHandler(authService, companyService, queries)
 
 	// Start gRPC server with auth interceptor
 	grpcServer := grpc.NewServer(
