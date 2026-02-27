@@ -23,9 +23,6 @@ func (h *Handler) CreateCompany(ctx context.Context, req *compiled.CreateCompany
 
 	company, err := h.companyService.CreateCompany(ctx, user.ID, req.CompanyName)
 	if err != nil {
-		if errors.Is(err, service.ErrAlreadyOwner) {
-			return nil, status.Error(codes.FailedPrecondition, "user already owns a company")
-		}
 		return nil, status.Error(codes.Internal, "failed to create company")
 	}
 

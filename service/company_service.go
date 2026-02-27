@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	ErrAlreadyOwner      = errors.New("user already owns a company")
 	ErrNotCompanyMember  = errors.New("user is not a member of this company")
 	ErrNotAdmin          = errors.New("user is not an admin of the selected company")
 	ErrNoSelectedCompany = errors.New("no company selected")
@@ -27,15 +26,6 @@ func NewCompanyService(queries *compiled.Queries) *CompanyService {
 }
 
 func (s *CompanyService) CreateCompany(ctx context.Context, userID int32, companyName string) (*compiled.CreateCompanyRow, error) {
-	// Check if user already owns a company
-	isOwner, err := s.queries.IsUserCompanyOwner(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if isOwner {
-		return nil, ErrAlreadyOwner
-	}
-
 	// Create company
 	company, err := s.queries.CreateCompany(ctx, compiled.CreateCompanyParams{
 		CompanyName: companyName,
