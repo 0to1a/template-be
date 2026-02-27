@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM lavorus/golang-builder:1.25 AS proto-builder
+FROM lavorus/golang-builder:1.26 AS proto-builder
 
 WORKDIR /app
 

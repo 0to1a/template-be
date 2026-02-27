@@ -3,7 +3,7 @@
 # Build: docker build -f Dockerfile.tools -t lavorus/golang-builder:1.25 .
 # Push:  docker push lavorus/golang-builder:1.25
 
-FROM golang:1.25-alpine
+FROM golang:1.26-alpine
 
 RUN apk add --no-cache curl git
 
