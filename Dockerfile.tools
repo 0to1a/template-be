@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Pre-built tools image for proto and sqlc generation
-# Build: docker build -f Dockerfile.tools -t lavorus/golang-builder:1.25 .
-# Push:  docker push lavorus/golang-builder:1.25
+# Build: docker build -f Dockerfile.tools -t lavorus/golang-builder:1.26 .
+# Push:  docker push lavorus/golang-builder:1.26
 
 FROM golang:1.26-alpine
 
