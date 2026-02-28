@@ -18,8 +18,9 @@ type contextKey string
 const UserContextKey contextKey = "user"
 
 var publicMethods = map[string]bool{
-	"/api.API/Health": true,
-	"/api.API/Login":  true,
+	"/api.API/Health":          true,
+	"/api.API/Login":           true,
+	"/api.API/RequestLoginOTP": true,
 }
 
 type Handler struct {

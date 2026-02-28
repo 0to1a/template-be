@@ -9,6 +9,34 @@
       "requests": [
         {
           "v": "17",
+          "name": "Request Login OTP",
+          "method": "POST",
+          "endpoint": "<<base_url>>/login-request",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "none",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"email\": \"user@example.com\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Request a login OTP. Sends an email with a 6-digit OTP (5-min expiry). @localhost emails use hardcoded OTP 123456. Always returns success."
+        },
+        {
+          "v": "17",
           "name": "Login",
           "method": "POST",
           "endpoint": "<<base_url>>/login",

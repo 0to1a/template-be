@@ -1,5 +1,5 @@
 -- name: FindUserByEmail :one
-SELECT id, email, name, token, created_at
+SELECT id, email, name, token, otp, otp_expires_at, created_at
 FROM users
 WHERE email = $1 AND deleted_at IS NULL;
 
@@ -75,3 +75,6 @@ WHERE cu.company_id = $1 AND cu.deleted_at IS NULL AND u.deleted_at IS NULL;
 -- name: RemoveUserFromCompany :exec
 UPDATE company_users SET deleted_at = NOW()
 WHERE company_id = $1 AND user_id = $2 AND deleted_at IS NULL;
+
+-- name: UpdateUserOTP :exec
+UPDATE users SET otp = $1, otp_expires_at = $2 WHERE id = $3;

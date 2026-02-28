@@ -18,6 +18,13 @@ service API {
     };
   }
 
+  rpc RequestLoginOTP(RequestLoginOTPRequest) returns (RequestLoginOTPResponse) {
+    option (google.api.http) = {
+      post: "/login-request"
+      body: "*"
+    };
+  }
+
   rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
     option (google.api.http) = { get: "/user/profile" };
   }
@@ -155,5 +162,13 @@ message UpdateProfileRequest {
 }
 
 message UpdateProfileResponse {
+  bool success = 1;
+}
+
+message RequestLoginOTPRequest {
+  string email = 1;
+}
+
+message RequestLoginOTPResponse {
   bool success = 1;
 }

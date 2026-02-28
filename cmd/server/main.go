@@ -46,7 +46,7 @@ func main() {
 
 	// Initialize layers
 	queries := compiled.New(pool)
-	authService := service.NewAuthService(queries)
+	authService := service.NewAuthService(queries, cfg.ResendAPIKey)
 	companyService := service.NewCompanyService(queries)
 	h := handler.NewHandler(authService, companyService, queries)
 

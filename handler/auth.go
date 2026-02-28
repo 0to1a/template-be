@@ -10,6 +10,13 @@ import (
 	"project/service"
 )
 
+func (h *Handler) RequestLoginOTP(ctx context.Context, req *compiled.RequestLoginOTPRequest) (*compiled.RequestLoginOTPResponse, error) {
+	if err := h.authService.RequestOTP(ctx, req.Email); err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+	return &compiled.RequestLoginOTPResponse{Success: true}, nil
+}
+
 func (h *Handler) Login(ctx context.Context, req *compiled.LoginRequest) (*compiled.LoginResponse, error) {
 	token, err := h.authService.Login(ctx, req.Email, req.Otp)
 	if err != nil {
