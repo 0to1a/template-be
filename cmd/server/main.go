@@ -81,7 +81,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:    ":" + cfg.HTTPPort,
-		Handler: mux,
+		Handler: corsHandler(mux),
 	}
 
 	go func() {
@@ -99,6 +99,21 @@ func main() {
 	log.Println("Shutting down...")
 	grpcServer.GracefulStop()
 	httpServer.Shutdown(ctx)
+}
+
+func corsHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 func runMigrations(databaseURL string) error {
