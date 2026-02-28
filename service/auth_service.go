@@ -60,9 +60,9 @@ func (s *AuthService) RequestOTP(ctx context.Context, email string) error {
 	if s.resendAPIKey != "" {
 		client := resend.NewClient(s.resendAPIKey)
 		_, err = client.Emails.Send(&resend.SendEmailRequest{
-			From:    "noreply@yourdomain.com",
+			From:    "noreply@mg.lavorus.com",
 			To:      []string{email},
-			Subject: "Your login OTP",
+			Subject: "Your access login OTP",
 			Text:    fmt.Sprintf("Your OTP is: %s\nIt expires in 5 minutes.", otp),
 		})
 		if err != nil {
