@@ -1,0 +1,318 @@
+{
+  "v": 11,
+  "name": "template-be",
+  "folders": [
+    {
+      "v": 11,
+      "name": "Auth",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "Login",
+          "method": "POST",
+          "endpoint": "<<base_url>>/login",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "// Set an environment variable\npw.env.set(\"token\", pw.response.body.token);",
+          "auth": {
+            "authType": "none",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"email\": \"admin@localhost\",\n  \"otp\": \"123456\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Login with email and OTP, returns JWT token"
+        }
+      ],
+      "auth": {
+        "authActive": true,
+        "authType": "none"
+      },
+      "headers": [],
+      "variables": [],
+      "description": ""
+    },
+    {
+      "v": 11,
+      "name": "User",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "Get Profile",
+          "method": "GET",
+          "endpoint": "<<base_url>>/user/profile",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Get current user profile (requires auth)"
+        },
+        {
+          "v": "17",
+          "name": "Update Profile",
+          "method": "PUT",
+          "endpoint": "<<base_url>>/user/profile",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"name\": \"New Name\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Update current user's name (requires auth)"
+        }
+      ],
+      "auth": {
+        "token": "<<token>>",
+        "authType": "bearer",
+        "authActive": true
+      },
+      "headers": [],
+      "variables": [],
+      "description": ""
+    },
+    {
+      "v": 11,
+      "name": "Company",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "Create Company",
+          "method": "POST",
+          "endpoint": "<<base_url>>/companies",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"company_name\": \"My Company\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Create a new company (requires auth, user can only own one company)"
+        },
+        {
+          "v": "17",
+          "name": "Select Company",
+          "method": "POST",
+          "endpoint": "<<base_url>>/companies/select",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"company_id\": 1\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Select active company (requires auth, user must be a member)"
+        },
+        {
+          "v": "17",
+          "name": "Invite User",
+          "method": "POST",
+          "endpoint": "<<base_url>>/companies/invite",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"email\": \"user@example.com\",\n  \"name\": \"New User\",\n  \"role\": \"member\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Invite user to selected company (requires auth, must be admin)"
+        },
+        {
+          "v": "17",
+          "name": "List Company Members",
+          "method": "GET",
+          "endpoint": "<<base_url>>/companies/members",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "List members of the selected company (requires auth)"
+        },
+        {
+          "v": "17",
+          "name": "Remove Company Member",
+          "method": "POST",
+          "endpoint": "<<base_url>>/companies/members/remove",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "<<token>>",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"user_id\": 1\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Remove a member from the selected company (requires auth, must be admin)"
+        }
+      ],
+      "auth": {
+        "token": "<<token>>",
+        "authType": "bearer",
+        "authActive": true
+      },
+      "headers": [],
+      "variables": [],
+      "description": ""
+    }
+  ],
+  "requests": [
+    {
+      "v": "17",
+      "name": "Base Endpoint",
+      "method": "GET",
+      "endpoint": "<<base_url>>/",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": null
+    },
+    {
+      "v": "17",
+      "name": "Health Check",
+      "method": "GET",
+      "endpoint": "<<base_url>>/health",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "",
+      "auth": {
+        "authType": "none",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {},
+      "description": "Check server health status"
+    }
+  ],
+  "auth": {
+    "authActive": true,
+    "authType": "none"
+  },
+  "headers": [],
+  "variables": [],
+  "description": "Template Backend API Collection"
+}
