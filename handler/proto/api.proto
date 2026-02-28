@@ -42,6 +42,17 @@ service API {
       body: "*"
     };
   }
+
+  rpc ListCompanyMembers(ListCompanyMembersRequest) returns (ListCompanyMembersResponse) {
+    option (google.api.http) = { get: "/companies/members" };
+  }
+
+  rpc RemoveCompanyMember(RemoveCompanyMemberRequest) returns (RemoveCompanyMemberResponse) {
+    option (google.api.http) = {
+      post: "/companies/members/remove"
+      body: "*"
+    };
+  }
 }
 
 message HealthRequest {}
@@ -109,4 +120,24 @@ message InviteUserResponse {
   string email = 2;
   string name = 3;
   string role = 4;
+}
+
+message ListCompanyMembersRequest {}
+
+message CompanyMember {
+  string name = 1;
+  string email = 2;
+  string role = 3;
+}
+
+message ListCompanyMembersResponse {
+  repeated CompanyMember members = 1;
+}
+
+message RemoveCompanyMemberRequest {
+  int64 user_id = 1;
+}
+
+message RemoveCompanyMemberResponse {
+  bool success = 1;
 }

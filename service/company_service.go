@@ -180,3 +180,38 @@ func (s *CompanyService) GetCompanyUserRole(ctx context.Context, companyID, user
 		UserID:    userID,
 	})
 }
+
+func (s *CompanyService) GetCompanyMembers(ctx context.Context, companyID int32) ([]compiled.GetCompanyMembersRow, error) {
+	return s.queries.GetCompanyMembers(ctx, companyID)
+}
+
+func (s *CompanyService) RemoveCompanyMember(ctx context.Context, adminID, companyID, targetUserID int32) error {
+	// Check if requester is admin
+	role, err := s.queries.GetCompanyUserRole(ctx, compiled.GetCompanyUserRoleParams{
+		CompanyID: companyID,
+		UserID:    adminID,
+	})
+	if err != nil {
+		return ErrNotAdmin
+	}
+	if role != "admin" {
+		return ErrNotAdmin
+	}
+
+	// Check if target user is a member
+	isMember, err := s.queries.IsUserMemberOfCompany(ctx, compiled.IsUserMemberOfCompanyParams{
+		CompanyID: companyID,
+		UserID:    targetUserID,
+	})
+	if err != nil {
+		return err
+	}
+	if !isMember {
+		return ErrNotCompanyMember
+	}
+
+	return s.queries.RemoveUserFromCompany(ctx, compiled.RemoveUserFromCompanyParams{
+		CompanyID: companyID,
+		UserID:    targetUserID,
+	})
+}

@@ -62,3 +62,13 @@ SELECT EXISTS(
 -- name: GetCompanyUserRole :one
 SELECT role FROM company_users
 WHERE company_id = $1 AND user_id = $2 AND deleted_at IS NULL;
+
+-- name: GetCompanyMembers :many
+SELECT u.name, u.email, cu.role
+FROM company_users cu
+JOIN users u ON cu.user_id = u.id
+WHERE cu.company_id = $1 AND cu.deleted_at IS NULL AND u.deleted_at IS NULL;
+
+-- name: RemoveUserFromCompany :exec
+UPDATE company_users SET deleted_at = NOW()
+WHERE company_id = $1 AND user_id = $2 AND deleted_at IS NULL;

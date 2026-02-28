@@ -104,3 +104,55 @@ func (h *Handler) InviteUser(ctx context.Context, req *compiled.InviteUserReques
 		Role:   req.Role,
 	}, nil
 }
+
+func (h *Handler) ListCompanyMembers(ctx context.Context, req *compiled.ListCompanyMembersRequest) (*compiled.ListCompanyMembersResponse, error) {
+	user, ok := UserFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unauthorized")
+	}
+	if user.SelectedCompanyID == 0 {
+		return nil, status.Error(codes.FailedPrecondition, "no company selected")
+	}
+
+	members, err := h.companyService.GetCompanyMembers(ctx, user.SelectedCompanyID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to get company members")
+	}
+
+	var result []*compiled.CompanyMember
+	for _, m := range members {
+		result = append(result, &compiled.CompanyMember{
+			Name:  m.Name,
+			Email: m.Email,
+			Role:  m.Role,
+		})
+	}
+
+	return &compiled.ListCompanyMembersResponse{Members: result}, nil
+}
+
+func (h *Handler) RemoveCompanyMember(ctx context.Context, req *compiled.RemoveCompanyMemberRequest) (*compiled.RemoveCompanyMemberResponse, error) {
+	user, ok := UserFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unauthorized")
+	}
+	if user.SelectedCompanyID == 0 {
+		return nil, status.Error(codes.FailedPrecondition, "no company selected")
+	}
+	if req.UserId == 0 {
+		return nil, status.Error(codes.InvalidArgument, "user_id is required")
+	}
+
+	err := h.companyService.RemoveCompanyMember(ctx, user.ID, user.SelectedCompanyID, int32(req.UserId))
+	if err != nil {
+		if errors.Is(err, service.ErrNotAdmin) {
+			return nil, status.Error(codes.PermissionDenied, "only admins can remove members")
+		}
+		if errors.Is(err, service.ErrNotCompanyMember) {
+			return nil, status.Error(codes.NotFound, "user is not a member of this company")
+		}
+		return nil, status.Error(codes.Internal, "failed to remove company member")
+	}
+
+	return &compiled.RemoveCompanyMemberResponse{Success: true}, nil
+}
