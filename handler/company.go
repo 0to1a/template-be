@@ -26,6 +26,9 @@ func (h *Handler) CreateCompany(ctx context.Context, req *compiled.CreateCompany
 		return nil, status.Error(codes.Internal, "failed to create company")
 	}
 
+	user.SelectedCompanyID = company.ID
+	h.cacheSetToken(user.Token, user)
+
 	return &compiled.CreateCompanyResponse{
 		Id:          int64(company.ID),
 		CompanyName: company.CompanyName,
@@ -50,6 +53,9 @@ func (h *Handler) SelectCompany(ctx context.Context, req *compiled.SelectCompany
 		}
 		return nil, status.Error(codes.Internal, "failed to select company")
 	}
+
+	user.SelectedCompanyID = company.ID
+	h.cacheSetToken(user.Token, user)
 
 	role, _ := h.companyService.GetCompanyUserRole(ctx, company.ID, user.ID)
 	isOwner := company.OwnerID == user.ID

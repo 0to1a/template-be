@@ -30,6 +30,24 @@ func (h *Handler) Login(ctx context.Context, req *compiled.LoginRequest) (*compi
 		}
 	}
 
+	row, err := h.queries.FindUserByToken(ctx, token)
+	if err == nil {
+		h.cacheDeleteByUserID(row.ID)
+
+		var selectedCompanyID int32
+		if row.SelectedCompanyID.Valid {
+			selectedCompanyID = row.SelectedCompanyID.Int32
+		}
+		h.cacheSetToken(token, &AuthenticatedUser{
+			ID:                row.ID,
+			Email:             row.Email,
+			Name:              row.Name,
+			SelectedCompanyID: selectedCompanyID,
+			CreatedAt:         row.CreatedAt.Time.Format("2006-01-02T15:04:05Z"),
+			Token:             token,
+		})
+	}
+
 	return &compiled.LoginResponse{
 		Token: token,
 	}, nil

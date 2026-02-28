@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+	"log"
 	"strings"
+	"sync"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -28,6 +30,7 @@ type Handler struct {
 	authService    *service.AuthService
 	companyService *service.CompanyService
 	queries        *compiled.Queries
+	tokenCache     sync.Map
 }
 
 func NewHandler(authService *service.AuthService, companyService *service.CompanyService, queries *compiled.Queries) *Handler {
@@ -60,12 +63,17 @@ type AuthenticatedUser struct {
 	Name              string
 	SelectedCompanyID int32
 	CreatedAt         string
+	Token             string
 }
 
 func (h *Handler) authenticate(ctx context.Context) (*AuthenticatedUser, error) {
 	token, err := extractToken(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if cached, ok := h.tokenCache.Load(token); ok {
+		return cached.(*AuthenticatedUser), nil
 	}
 
 	row, err := h.queries.FindUserByToken(ctx, token)
@@ -78,13 +86,17 @@ func (h *Handler) authenticate(ctx context.Context) (*AuthenticatedUser, error) 
 		selectedCompanyID = row.SelectedCompanyID.Int32
 	}
 
-	return &AuthenticatedUser{
+	user := &AuthenticatedUser{
 		ID:                row.ID,
 		Email:             row.Email,
 		Name:              row.Name,
 		SelectedCompanyID: selectedCompanyID,
 		CreatedAt:         row.CreatedAt.Time.Format("2006-01-02T15:04:05Z"),
-	}, nil
+		Token:             token,
+	}
+	h.cacheSetToken(token, user)
+
+	return user, nil
 }
 
 func extractToken(ctx context.Context) (string, error) {
@@ -109,4 +121,44 @@ func extractToken(ctx context.Context) (string, error) {
 func UserFromContext(ctx context.Context) (*AuthenticatedUser, bool) {
 	user, ok := ctx.Value(UserContextKey).(*AuthenticatedUser)
 	return user, ok
+}
+
+func (h *Handler) LoadTokenCache(ctx context.Context) {
+	rows, err := h.queries.GetAllUsersWithToken(ctx)
+	if err != nil {
+		log.Printf("Failed to load token cache: %v", err)
+		return
+	}
+
+	for _, row := range rows {
+		var selectedCompanyID int32
+		if row.SelectedCompanyID.Valid {
+			selectedCompanyID = row.SelectedCompanyID.Int32
+		}
+
+		h.tokenCache.Store(row.Token.String, &AuthenticatedUser{
+			ID:                row.ID,
+			Email:             row.Email,
+			Name:              row.Name,
+			SelectedCompanyID: selectedCompanyID,
+			CreatedAt:         row.CreatedAt.Time.Format("2006-01-02T15:04:05Z"),
+			Token:             row.Token.String,
+		})
+	}
+
+	log.Printf("Token cache loaded: %d entries", len(rows))
+}
+
+func (h *Handler) cacheSetToken(token string, user *AuthenticatedUser) {
+	h.tokenCache.Store(token, user)
+}
+
+func (h *Handler) cacheDeleteByUserID(userID int32) {
+	h.tokenCache.Range(func(key, value any) bool {
+		if value.(*AuthenticatedUser).ID == userID {
+			h.tokenCache.Delete(key)
+			return false
+		}
+		return true
+	})
 }

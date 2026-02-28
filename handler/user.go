@@ -27,6 +27,9 @@ func (h *Handler) UpdateProfile(ctx context.Context, req *compiled.UpdateProfile
 		return nil, status.Error(codes.Internal, "failed to update profile")
 	}
 
+	user.Name = req.Name
+	h.cacheSetToken(user.Token, user)
+
 	return &compiled.UpdateProfileResponse{Success: true}, nil
 }
 

@@ -49,6 +49,7 @@ func main() {
 	authService := service.NewAuthService(queries, cfg.ResendAPIKey)
 	companyService := service.NewCompanyService(queries)
 	h := handler.NewHandler(authService, companyService, queries)
+	h.LoadTokenCache(context.Background())
 
 	// Start gRPC server with auth interceptor
 	grpcServer := grpc.NewServer(

@@ -78,3 +78,8 @@ WHERE company_id = $1 AND user_id = $2 AND deleted_at IS NULL;
 
 -- name: UpdateUserOTP :exec
 UPDATE users SET otp = $1, otp_expires_at = $2 WHERE id = $3;
+
+-- name: GetAllUsersWithToken :many
+SELECT id, email, name, token, selected_company_id, created_at
+FROM users
+WHERE token IS NOT NULL AND deleted_at IS NULL;
