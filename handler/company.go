@@ -146,6 +146,9 @@ func (h *Handler) RemoveCompanyMember(ctx context.Context, req *compiled.RemoveC
 
 	err := h.companyService.RemoveCompanyMember(ctx, user.ID, user.SelectedCompanyID, int32(req.UserId))
 	if err != nil {
+		if errors.Is(err, service.ErrCannotRemoveSelf) {
+			return nil, status.Error(codes.InvalidArgument, "cannot remove yourself from the company")
+		}
 		if errors.Is(err, service.ErrNotAdmin) {
 			return nil, status.Error(codes.PermissionDenied, "only admins can remove members")
 		}

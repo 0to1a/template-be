@@ -185,7 +185,13 @@ func (s *CompanyService) GetCompanyMembers(ctx context.Context, companyID int32)
 	return s.queries.GetCompanyMembers(ctx, companyID)
 }
 
+var ErrCannotRemoveSelf = errors.New("cannot remove yourself from the company")
+
 func (s *CompanyService) RemoveCompanyMember(ctx context.Context, adminID, companyID, targetUserID int32) error {
+	if adminID == targetUserID {
+		return ErrCannotRemoveSelf
+	}
+
 	// Check if requester is admin
 	role, err := s.queries.GetCompanyUserRole(ctx, compiled.GetCompanyUserRoleParams{
 		CompanyID: companyID,
