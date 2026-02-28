@@ -79,3 +79,11 @@ database/                  → Migrations & queries (sqlc)
 3. Use generated method via `queries.QueryName(ctx, params)` in service layer
 
 **Error handling in handlers:** Map service-layer sentinel errors (e.g. `service.ErrNotAdmin`) to gRPC status codes. Return `status.Error(codes.X, "message")`.
+
+**API Collection (`hoppscotch.json`):**
+- When adding or updating HTTP endpoints, always update `hoppscotch.json` to reflect the changes
+- Requests are organized by domain folders (Auth, User, Company, etc.)
+- Use `<<base_url>>` variable for the endpoint base URL
+- Use `<<token>>` variable for Bearer auth tokens
+- Include `testScript` to auto-set env vars when useful (e.g. saving token from login response)
+- Each request should have a `description` explaining its purpose and requirements
