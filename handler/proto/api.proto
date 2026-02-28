@@ -22,6 +22,13 @@ service API {
     option (google.api.http) = { get: "/user/profile" };
   }
 
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+    option (google.api.http) = {
+      put: "/user/profile"
+      body: "*"
+    };
+  }
+
   rpc CreateCompany(CreateCompanyRequest) returns (CreateCompanyResponse) {
     option (google.api.http) = {
       post: "/companies"
@@ -140,5 +147,13 @@ message RemoveCompanyMemberRequest {
 }
 
 message RemoveCompanyMemberResponse {
+  bool success = 1;
+}
+
+message UpdateProfileRequest {
+  string name = 1;
+}
+
+message UpdateProfileResponse {
   bool success = 1;
 }

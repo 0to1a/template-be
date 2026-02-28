@@ -19,6 +19,9 @@ RETURNING id, email, name, selected_company_id, created_at;
 -- name: UpdateUserSelectedCompany :exec
 UPDATE users SET selected_company_id = $1 WHERE id = $2;
 
+-- name: UpdateUserName :exec
+UPDATE users SET name = $1 WHERE id = $2 AND deleted_at IS NULL;
+
 -- Company queries
 -- name: CreateCompany :one
 INSERT INTO companies (company_name, owner_id)

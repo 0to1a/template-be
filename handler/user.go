@@ -9,6 +9,27 @@ import (
 	"project/compiled"
 )
 
+func (h *Handler) UpdateProfile(ctx context.Context, req *compiled.UpdateProfileRequest) (*compiled.UpdateProfileResponse, error) {
+	user, ok := UserFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unauthorized")
+	}
+
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "name is required")
+	}
+
+	err := h.queries.UpdateUserName(ctx, compiled.UpdateUserNameParams{
+		Name: req.Name,
+		ID:   user.ID,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to update profile")
+	}
+
+	return &compiled.UpdateProfileResponse{Success: true}, nil
+}
+
 func (h *Handler) GetProfile(ctx context.Context, req *compiled.GetProfileRequest) (*compiled.GetProfileResponse, error) {
 	user, ok := UserFromContext(ctx)
 	if !ok {
