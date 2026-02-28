@@ -20,6 +20,8 @@ RUN sqlc generate
 # Build stage
 FROM golang:1.26-alpine AS builder
 
+RUN apk add --no-cache tzdata
+
 WORKDIR /app
 
 # Copy go mod files
@@ -36,17 +38,15 @@ COPY database/ database/
 COPY service/ service/
 
 # Build binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /server ./cmd/server
 
 # Final stage
-FROM alpine:3.23
+FROM scratch
 
-RUN apk add --no-cache ca-certificates tzdata
-
-WORKDIR /app
-
-COPY --from=builder /server .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /server /server
 
 EXPOSE 8080 9090
 
-CMD ["./server"]
+ENTRYPOINT ["/server"]
