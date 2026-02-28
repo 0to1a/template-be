@@ -125,9 +125,10 @@ message InviteUserResponse {
 message ListCompanyMembersRequest {}
 
 message CompanyMember {
-  string name = 1;
-  string email = 2;
-  string role = 3;
+  int64 user_id = 1;
+  string name = 2;
+  string email = 3;
+  string role = 4;
 }
 
 message ListCompanyMembersResponse {

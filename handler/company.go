@@ -122,9 +122,10 @@ func (h *Handler) ListCompanyMembers(ctx context.Context, req *compiled.ListComp
 	var result []*compiled.CompanyMember
 	for _, m := range members {
 		result = append(result, &compiled.CompanyMember{
-			Name:  m.Name,
-			Email: m.Email,
-			Role:  m.Role,
+			UserId: int64(m.ID),
+			Name:   m.Name,
+			Email:  m.Email,
+			Role:   m.Role,
 		})
 	}
 
